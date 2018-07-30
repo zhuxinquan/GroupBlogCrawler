@@ -1,13 +1,19 @@
 package models
 
 import (
-	"io/ioutil"
 	"github.com/BurntSushi/toml"
+	"io/ioutil"
 	"log"
 )
 
 type Config struct {
-	DB DBConfig `toml: "dbs"`
+	DB    DBConfig `toml: "dbs"`
+	Qiniu Qiniu    `toml:"qiniu"`
+}
+
+type Qiniu struct {
+	AccessKey string `toml:"accessKey"`
+	SecretKey string `toml:"secretKey"`
 }
 
 type DBConfig struct {
@@ -19,7 +25,7 @@ type DBConfig struct {
 	MaxOpenConns int      `toml: "maxOpenConns"`
 }
 
-var config * Config
+var config *Config
 
 func Conf() *Config {
 	return config

@@ -2,12 +2,12 @@ package main
 
 import (
 	"common"
-	"manager/models"
 	"manager"
+	"manager/models"
 	"time"
 )
 
-func main(){
+func main() {
 	models.InitConfig()
 	common.InitDB()
 	for true {

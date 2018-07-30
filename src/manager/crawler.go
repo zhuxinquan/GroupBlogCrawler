@@ -32,8 +32,9 @@ func (this Crawlers) GetCsdn(url string, uid int64) {
 		xml.Unmarshal([]byte(body), &content)
 		blogContent := content.Channel.Item
 		for i, blog := range blogContent {
-			log.Println(i, blog.Title, blog.PubDate)
 			tmpBlog := dbs.Blogs{}.GetBlogByBlogArticleLink(blog.Link)
+			blog.Description = models.Csdn{}.ReplaceImgUrlToQiniuCdnUrl(blog.Description, tmpBlog.Id)
+			log.Println(i, blog.Title, blog.PubDate)
 			if tmpBlog.Id != 0 {
 				dbs.Blogs{}.UpdateBlog(tmpBlog.Id, blog.Title, blog.Author, this.stringTime2Timestamp(blog.PubDate, "csdn"), blog.Description, nil, nil)
 			} else {

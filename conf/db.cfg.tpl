@@ -12,3 +12,7 @@ maxIdleConns = 50
 
 # 处于open的最大连接数
 maxOpenConns = 100
+
+[qiniu]
+accessKey = ""
+secretKey = ""
