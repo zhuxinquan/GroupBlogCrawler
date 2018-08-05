@@ -49,12 +49,10 @@ type Item struct {
 	Category    string   `xml:"category"`
 }
 
-func (this Csdn) ReplaceImgUrlToQiniuCdnUrl(content string, existBlogId int64) string {
+func (this Csdn) ReplaceImgUrlToQiniuCdnUrl(content string) string {
 	reg := regexp.MustCompile(`https://img-blog\.csdn\.net/\d*`)
-	if existBlogId == 0 {
-		for _, url := range reg.FindAllString(content, -1) {
-			this.UploadQiniu(url)
-		}
+	for _, url := range reg.FindAllString(content, -1) {
+		this.UploadQiniu(url)
 	}
 	reg1 := regexp.MustCompile(`https://img-blog\.csdn\.net/`)
 	newContent := reg1.ReplaceAll([]byte(content), []byte("http://blog-image.xiyoulinux.org/"))
@@ -69,13 +67,6 @@ func (this Csdn) UploadQiniu(url string) {
 	} else {
 		return
 	}
-	cmdUrl := fmt.Sprintf("curl -H \"Referer:http://blog.csdn.net\" %s -o /tmp/%s.csdn.tmp", url, key)
-	cmd := exec.Command("bash", "-c", cmdUrl)
-	_, err := cmd.CombinedOutput()
-	if err != nil {
-		log.Printf("cmdUrl:%s, err:%v", cmdUrl, err)
-	}
-	localFile := fmt.Sprintf("/tmp/%s.csdn.tmp", key)
 
 	bucket := "blog"
 	putPolicy := storage.PutPolicy{
@@ -92,6 +83,20 @@ func (this Csdn) UploadQiniu(url string) {
 	cfg.UseHTTPS = false
 	// 上传是否使用CDN上传加速
 	cfg.UseCdnDomains = false
+
+	bucketManager := storage.NewBucketManager(mac, &cfg)
+	_, sErr := bucketManager.Stat(bucket, key)
+	if sErr == nil {
+		return
+	}
+
+	cmdUrl := fmt.Sprintf("curl -H \"Referer:http://blog.csdn.net\" %s -o /tmp/%s.csdn.tmp", url, key)
+	cmd := exec.Command("bash", "-c", cmdUrl)
+	_, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Printf("cmdUrl:%s, err:%v", cmdUrl, err)
+	}
+	localFile := fmt.Sprintf("/tmp/%s.csdn.tmp", key)
 
 	resumeUploader := storage.NewResumeUploader(&cfg)
 	ret := storage.PutRet{}
