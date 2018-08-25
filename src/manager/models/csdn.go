@@ -56,6 +56,8 @@ func (this Csdn) ReplaceImgUrlToQiniuCdnUrl(content string) string {
 	}
 	reg1 := regexp.MustCompile(`https://img-blog\.csdn\.net/`)
 	newContent := reg1.ReplaceAll([]byte(content), []byte("http://blog-image.xiyoulinux.org/"))
+	reg2 := regexp.MustCompile(`watermark/2/text/\.*/font`)
+	newContent = reg2.ReplaceAll([]byte(newContent), []byte("watermark/2/text/aHR0cDovL2Jsb2cueGl5b3VsaW51eC5vcmc=/font"))
 	return string(newContent)
 }
 
