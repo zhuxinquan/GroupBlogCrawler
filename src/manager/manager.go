@@ -2,6 +2,7 @@ package manager
 
 import (
 	"fmt"
+	"log"
 	"manager/models/dbs"
 )
 
@@ -9,6 +10,7 @@ import (
 func Manager() {
 	users := dbs.Users{}.GetAll()
 	for _, user := range *users {
+		log.Printf("Start User: %s, Type: %s", user.Name, user.BlogType)
 		if user.Flag == 0 {
 			continue
 		}

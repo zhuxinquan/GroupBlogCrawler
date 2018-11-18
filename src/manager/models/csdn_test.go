@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/qiniu/api.v7/auth/qbox"
 	"github.com/qiniu/api.v7/storage"
+	"regexp"
 	"strings"
 	"testing"
 )
@@ -44,6 +45,10 @@ func TestCsdn_UploadQiniu(t *testing.T) {
 	fmt.Println(fileInfo.String())
 }
 
-//func TestCsdn_ReplaceImgUrlToQiniuCdnUrl(t *testing.T) {
-//	Csdn{}.ReplaceImgUrlToQiniuCdnUrl()
-//}
+func TestCsdn_ReplaceImgUrlToQiniuCdnUrl(t *testing.T) {
+	con := `<p><img src="https://img-blog.csdn.net/20180731092048866?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3podXhpbnF1YW42MQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="这里写图片描述" title=""></p>`
+	reg := regexp.MustCompile(`https://img-blog\.csdn\.net/.*?\"`)
+	result := reg.Find([]byte(con))
+	fmt.Println(string(result))
+	//imgUrl := "https://img-blog.csdnimg.cn/20181108214953776.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zNjg4ODU3Nw==,size_16,color_FFFFFF,t_70"
+}

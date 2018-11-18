@@ -50,15 +50,19 @@ type Item struct {
 }
 
 func (this Csdn) ReplaceImgUrlToQiniuCdnUrl(content string) string {
-	reg := regexp.MustCompile(`https://img-blog\.csdn\.net/\d*`)
-	for _, url := range reg.FindAllString(content, -1) {
-		this.UploadQiniu(url)
+	imgUrlReg := regexp.MustCompile(`src=\"https://img-blog\.(csdn|csdnimg)\.(net|cn)/.*?\"`)
+	for _, urlData := range imgUrlReg.FindAllString(content, -1) {
+		url := string(urlData)
+		spliteData := strings.Split(url, "?")
+		imgLink := strings.TrimPrefix(spliteData[0], "src=\"")
+		watermark := strings.TrimSuffix(spliteData[1], "\"")
+		fmt.Println(imgLink, watermark)
+		this.UploadQiniu(imgLink)
+		replaceSource := fmt.Sprintf("%s?%s", imgLink, watermark)
+		replaceTarget := fmt.Sprintf("%s%s%s", "http://blog-image.xiyoulinux.org/", strings.Split(imgLink, "/")[3], "?watermark/2/text/aHR0cDovL2Jsb2cueGl5b3VsaW51eC5vcmc=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70")
+		content = strings.Replace(content, replaceSource, replaceTarget, -1)
 	}
-	reg1 := regexp.MustCompile(`https://img-blog\.csdn\.net/`)
-	newContent := reg1.ReplaceAll([]byte(content), []byte("http://blog-image.xiyoulinux.org/"))
-	reg2 := regexp.MustCompile(`watermark/2/text/\.*/font`)
-	newContent = reg2.ReplaceAll([]byte(newContent), []byte("watermark/2/text/aHR0cDovL2Jsb2cueGl5b3VsaW51eC5vcmc=/font"))
-	return string(newContent)
+	return content
 }
 
 func (this Csdn) UploadQiniu(url string) {
